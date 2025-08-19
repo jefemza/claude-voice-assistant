@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva - Desplegar en Vercel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            background: #f0f0f0;
+            height: 8px;
+            margin: 20px 30px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        
+        .step-title {
+            font-size: 1.8em;
+            color: #333;
+        }
+        
+        .step-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        
+        .warning strong {
+            color: #d63031;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #155724;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .screenshot-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .url-box {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .url-box a {
+            color: #1976D2;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+        
+        .url-box a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Guía para Desplegar tu App</h1>
+            <p>Sigue estos pasos simples para publicar tu Asistente de Voz con Claude</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <!-- Paso 1: Verificar Estado -->
+        <div class="step active" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Verificar Estado Actual</div>
+            </div>
+            <div class="step-content">
+                <p>Primero, vamos a verificar qué tenemos listo:</p>
+                
+                <div class="success">
+                    <strong>✅ Lo que YA está listo:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>✅ Código subido a GitHub</li>
+                        <li>✅ Repositorio limpio (sin API keys expuestas)</li>
+                        <li>✅ Archivos de configuración creados</li>
+                    </ul>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Problema detectado:</strong><br>
+                    Tu aplicación NO está funcionando en internet. Las URLs devuelven error 404:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>❌ claude-asistente-de-voz-uno.vercel.app</li>
+                        <li>❌ jefemza-claude-voice-assistant.vercel.app</li>
+                    </ul>
+                </div>
+                
+                <p><strong>¿Qué significa esto?</strong> Tu código está listo, pero Vercel no lo ha desplegado correctamente. ¡No te preocupes, es fácil de arreglar!</p>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" disabled>← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 2: Abrir Vercel -->
+        <div class="step" id="step2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Abrir Vercel Dashboard</div>
+            </div>
+            <div class="step-content">
+                <p>Ahora vamos a abrir tu panel de control de Vercel:</p>
+                
+                <div class="url-box">
+                    <p>Haz clic aquí para abrir Vercel:</p>
+                    <a href="https://vercel.com/dashboard" target="_blank">🔗 Abrir Vercel Dashboard</a>
+                </div>
+                
+                <p><strong>¿Qué vas a ver?</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Una lista de tus proyectos</li>
+                    <li>Deberías ver un proyecto llamado algo como "claude-asistente-de-voz-uno"</li>
+                </ul>
+                
+                <div class="screenshot-placeholder">
+                    📸 Aquí verás una lista de proyectos en Vercel<br>
+                    Busca el proyecto "claude-asistente-de-voz-uno"
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He abierto Vercel Dashboard</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> Puedo ver mi proyecto en la lista</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 3: Entrar al Proyecto -->
+        <div class="step" id="step3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Entrar a tu Proyecto</div>
+            </div>
+            <div class="step-content">
+                <p>Ahora vamos a entrar a tu proyecto específico:</p>
+                
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Busca</strong> el proyecto "claude-asistente-de-voz-uno" en la lista</li>
+                    <li><strong>Haz clic</strong> en el nombre del proyecto para abrirlo</li>
+                </ol>
+                
+                <div class="screenshot-placeholder">
+                    📸 Pantalla del proyecto individual<br>
+                    Verás pestañas como: Overview, Functions, Deployments, Settings
+                </div>
+                
+                <p><strong>¿Qué deberías ver?</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>El nombre de tu proyecto en la parte superior</li>
+                    <li>Una URL como "claude-asistente-de-voz-uno.vercel.app"</li>
+                    <li>Pestañas de navegación</li>
+                    <li>Posiblemente un mensaje de error o "404"</li>
+                </ul>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He encontrado mi proyecto</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He hecho clic para abrirlo</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> Puedo ver la URL del proyecto</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 4: Verificar Conexión GitHub -->
+        <div class="step" id="step4">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">Verificar Conexión con GitHub</div>
+            </div>
+            <div class="step-content">
+                <p>Vamos a asegurarnos de que Vercel esté conectado a tu código en GitHub:</p>
+                
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Busca</strong> la pestaña "Settings" y haz clic</li>
+                    <li><strong>Busca</strong> la sección "Git Repository" o "Source Code"</li>
+                    <li><strong>Verifica</strong> que diga "jefemza/claude-voice-assistant"</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>✅ Si ves "jefemza/claude-voice-assistant":</strong><br>
+                    ¡Perfecto! Tu repositorio está conectado correctamente.
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Si NO ves el repositorio o dice "No repository connected":</strong><br>
+                    Necesitas conectar tu repositorio:
+                    <ol style="margin-top: 10px; margin-left: 20px;">
+                        <li>Busca un botón "Connect Git Repository"</li>
+                        <li>Selecciona GitHub</li>
+                        <li>Busca y selecciona "jefemza/claude-voice-assistant"</li>
+                    </ol>
+                </div>
+                
+                <div class="screenshot-placeholder">
+                    📸 Sección Settings → Git Repository<br>
+                    Deberías ver "jefemza/claude-voice-assistant" conectado
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He ido a Settings</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He verificado la conexión de GitHub</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> Mi repositorio está conectado</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 5: Hacer Deploy -->
+        <div class="step" id="step5">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">Hacer el Deploy (Despliegue)</div>
+            </div>
+            <div class="step-content">
+                <p>¡Ahora viene la parte emocionante! Vamos a desplegar tu aplicación:</p>
+                
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Ve</strong> a la pestaña "Deployments"</li>
+                    <li><strong>Busca</strong> un botón que diga "Deploy" o "Redeploy"</li>
+                    <li><strong>Haz clic</strong> en ese botón</li>
+                    <li><strong>Espera</strong> a que termine (puede tomar 1-3 minutos)</li>
+                </ol>
+                
+                <div class="warning">
+                    <strong>⚠️ Importante:</strong><br>
+                    Durante el deploy, verás una pantalla de progreso. ¡NO cierres la ventana! Espera a que termine.
+                </div>
+                
+                <p><strong>¿Qué verás durante el deploy?</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Una barra de progreso o spinner</li>
+                    <li>Mensajes como "Building..." o "Deploying..."</li>
+                    <li>Al final: "Deployment Successful" o similar</li>
+                </ul>
+                
+                <div class="screenshot-placeholder">
+                    📸 Pantalla de deploy en progreso<br>
+                    Verás el progreso de construcción y despliegue
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He ido a Deployments</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He hecho clic en Deploy/Redeploy</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> El deploy ha terminado exitosamente</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 6: Configurar API Key -->
+        <div class="step" id="step6">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <div class="step-title">Configurar la API Key de Claude</div>
+            </div>
+            <div class="step-content">
+                <p>Tu app necesita una clave secreta para hablar con Claude. Vamos a configurarla:</p>
+                
+                <div class="warning">
+                    <strong>🔑 PRIMERO: Genera una nueva API Key</strong><br>
+                    La anterior fue expuesta y ya no es segura. Ve a:
+                    <div class="url-box">
+                        <a href="https://console.anthropic.com/" target="_blank">🔗 Anthropic Console</a>
+                    </div>
+                    <ol style="margin-top: 10px; margin-left: 20px;">
+                        <li>Inicia sesión en Anthropic</li>
+                        <li>Ve a "API Keys"</li>
+                        <li>Elimina la clave anterior (si existe)</li>
+                        <li>Crea una nueva clave</li>
+                        <li>COPIA la nueva clave (empieza con "sk-")</li>
+                    </ol>
+                </div>
+                
+                <p><strong>Ahora, en Vercel:</strong></p>
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Ve</strong> a Settings → Environment Variables</li>
+                    <li><strong>Haz clic</strong> en "Add New"</li>
+                    <li><strong>En "Name"</strong> escribe: <code class="code-block">VITE_ANTHROPIC_API_KEY</code></li>
+                    <li><strong>En "Value"</strong> pega tu nueva API key</li>
+                    <li><strong>Selecciona</strong> Production, Preview, Development</li>
+                    <li><strong>Haz clic</strong> en "Save"</li>
+                </ol>
+                
+                <div class="screenshot-placeholder">
+                    📸 Pantalla Environment Variables<br>
+                    Formulario para agregar VITE_ANTHROPIC_API_KEY
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He generado una nueva API key en Anthropic</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He ido a Settings → Environment Variables</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He agregado VITE_ANTHROPIC_API_KEY</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> He guardado la configuración</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 7: Redeploy Final -->
+        <div class="step" id="step7">
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <div class="step-title">Redeploy con la Nueva Configuración</div>
+            </div>
+            <div class="step-content">
+                <p>Ahora que agregaste la API key, necesitas hacer un nuevo deploy para que tome efecto:</p>
+                
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Ve</strong> nuevamente a la pestaña "Deployments"</li>
+                    <li><strong>Haz clic</strong> en "Redeploy" otra vez</li>
+                    <li><strong>Espera</strong> a que termine el nuevo deploy</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>✅ ¿Por qué hacer esto?</strong><br>
+                    Vercel necesita reconstruir tu app con la nueva API key para que funcione correctamente.
+                </div>
+                
+                <p><strong>Este deploy debería ser más rápido</strong> porque ya tiene todo preparado de antes.</p>
+                
+                <div class="screenshot-placeholder">
+                    📸 Segundo deploy en progreso<br>
+                    Debería ser más rápido que el primero
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> He hecho el segundo deploy</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> El deploy ha terminado exitosamente</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="nextStep()">Siguiente →</button>
+            </div>
+        </div>
+        
+        <!-- Paso 8: Probar la App -->
+        <div class="step" id="step8">
+            <div class="step-header">
+                <div class="step-number">8</div>
+                <div class="step-title">¡Probar tu Aplicación!</div>
+            </div>
+            <div class="step-content">
+                <p>¡El momento de la verdad! Vamos a probar si tu app funciona:</p>
+                
+                <div class="url-box">
+                    <p>Haz clic para abrir tu aplicación:</p>
+                    <a href="https://claude-asistente-de-voz-uno.vercel.app" target="_blank">🚀 Abrir Mi App</a>
+                </div>
+                
+                <p><strong>¿Qué deberías ver?</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ Una página que se carga (no error 404)</li>
+                    <li>✅ Un formulario para ingresar tu API key</li>
+                    <li>✅ Botones para hablar con el asistente</li>
+                </ul>
+                
+                <p><strong>Prueba completa:</strong></p>
+                <ol style="margin-left: 20px; font-size: 1.1em;">
+                    <li><strong>Ingresa</strong> tu API key en el formulario</li>
+                    <li><strong>Haz clic</strong> en "Conectar"</li>
+                    <li><strong>Prueba</strong> hacer una pregunta al asistente</li>
+                    <li><strong>Verifica</strong> que responda correctamente</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>🎉 ¡Si todo funciona, FELICITACIONES!</strong><br>
+                    Tu Asistente de Voz con Claude está funcionando en internet y cualquier persona puede usarlo.
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Si algo no funciona:</strong><br>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Verifica que la API key sea correcta</li>
+                        <li>Revisa que hayas hecho el segundo deploy</li>
+                        <li>Espera unos minutos y vuelve a intentar</li>
+                    </ul>
+                </div>
+                
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox" onchange="updateProgress()"> La página se carga sin errores</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> Puedo ingresar mi API key</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> El asistente responde a mis preguntas</li>
+                        <li><input type="checkbox" onchange="updateProgress()"> ¡Todo funciona perfectamente!</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Anterior</button>
+                <button class="btn btn-primary" onclick="showSuccess()">¡Terminé! 🎉</button>
+            </div>
+        </div>
+        
+        <!-- Pantalla de Éxito -->
+        <div class="step" id="success">
+            <div style="text-align: center; padding: 60px 40px;">
+                <div style="font-size: 4em; margin-bottom: 20px;">🎉</div>
+                <h2 style="color: #4CAF50; margin-bottom: 20px;">¡FELICITACIONES!</h2>
+                <p style="font-size: 1.3em; margin-bottom: 30px;">Tu Asistente de Voz con Claude está funcionando perfectamente en internet.</p>
+                
+                <div class="url-box">
+                    <p>Tu aplicación está disponible en:</p>
+                    <a href="https://claude-asistente-de-voz-uno.vercel.app" target="_blank">claude-asistente-de-voz-uno.vercel.app</a>
+                </div>
+                
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 30px 0; text-align: left;">
+                    <h3>📋 Resumen de lo que lograste:</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Subiste tu código a GitHub de forma segura</li>
+                        <li>✅ Configuraste Vercel correctamente</li>
+                        <li>✅ Desplegaste tu aplicación en internet</li>
+                        <li>✅ Configuraste la API key de forma segura</li>
+                        <li>✅ Probaste que todo funcione</li>
+                    </ul>
+                </div>
+                
+                <p style="margin-top: 30px; color: #666;">¡Ahora puedes compartir tu aplicación con amigos y familia!</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        const totalSteps = 8;
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function showStep(stepNumber) {
+            // Ocultar todos los pasos
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => step.classList.remove('active'));
+            
+            // Mostrar el paso actual
+            if (stepNumber === 'success') {
+                document.getElementById('success').classList.add('active');
+            } else {
+                document.getElementById('step' + stepNumber).classList.add('active');
+            }
+            
+            updateProgress();
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        function showSuccess() {
+            showStep('success');
+        }
+        
+        // Inicializar
+        updateProgress();
+        
+        // Manejar checkboxes para auto-avance
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                const stepElement = e.target.closest('.step');
+                const checkboxes = stepElement.querySelectorAll('input[type="checkbox"]');
+                const checkedBoxes = stepElement.querySelectorAll('input[type="checkbox"]:checked');
+                
+                // Si todos los checkboxes están marcados, habilitar el botón siguiente
+                if (checkboxes.length === checkedBoxes.length) {
+                    const nextButton = stepElement.querySelector('.btn-primary');
+                    if (nextButton) {
+                        nextButton.style.background = '#4CAF50';
+                        nextButton.style.transform = 'scale(1.05)';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
